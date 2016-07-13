@@ -121,24 +121,42 @@ var nextMap = CC1.PAD12;
 
 
 // PC & PB A - Preset Navigation
-var previousPreset = PC1.PAD05;
-var nextPreset = PC1.PAD01;
-var previousPresetCategory = PC1.PAD06;
-var nextPresetCategory = PC1.PAD02;
-var previousPresetCreator = PC1.PAD07;
-var nextPresetCreator = PC1.PAD03;
-var toggleMacro2 = PC1.PAD08;
-var nextMap2 = PC1.PAD04;
+var previousPreset = PC1.PAD013;
+var nextPreset = PC1.PAD09;
+var previousPresetCategory = PC1.PAD014;
+var nextPresetCategory = PC1.PAD10;
+var previousPresetCreator = PC1.PAD015;
+var nextPresetCreator = PC1.PAD11;
+var toggleMacro2 = PC1.PAD016;
+var nextMap2 = PC1.PAD12;
+
+//var previousPreset = PC1.PAD05;
+//var nextPreset = PC1.PAD01;
+//var previousPresetCategory = PC1.PAD06;
+//var nextPresetCategory = PC1.PAD02;
+//var previousPresetCreator = PC1.PAD07;
+//var nextPresetCreator = PC1.PAD03;
+//var toggleMacro2 = PC1.PAD08;
+//var nextMap2 = PC1.PAD04;
 
 // PC & PB B - GUI Navigation
-var note = PC1.PAD09;
-var automation = PC1.PAD10;
-var mixer = PC1.PAD11;
-var device = PC1.PAD12;
-var inspector = PC1.PAD13;
-var perspective = PC1.PAD14;
-var project = PC1.PAD15;
-var browser = PC1.PAD16;
+var note = PC1.PAD01;
+var automation = PC1.PAD02;
+var mixer = PC1.PAD03;
+var device = PC1.PAD04;
+var inspector = PC1.PAD05;
+var perspective = PC1.PAD06;
+var project = PC1.PAD07;
+var browser = PC1.PAD08;
+
+//var note = PC1.PAD09;
+//var automation = PC1.PAD10;
+//var mixer = PC1.PAD11;
+//var device = PC1.PAD12;
+//var inspector = PC1.PAD13;
+//var perspective = PC1.PAD14;
+//var project = PC1.PAD15;
+//var browser = PC1.PAD16;
 
 
 
