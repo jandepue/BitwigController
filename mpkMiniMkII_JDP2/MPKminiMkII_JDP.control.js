@@ -9,12 +9,14 @@
 loadAPI(1); 
 
 load("MPKminiMkII_JDP_Mapping.js"); // All mapping is done here
+load("MPKminiMkII_JDP_HandlersRegistry.js"); // All mapping is done here
+load("MPKminiMkII_JDP_TrackControl.js");
 
 // Define the controller
 
-host.defineController("JDP", "MPKminiMkII_JDP1", "1.0", "c790467a-ce30-42d9-8deb-8070a6039c4b","Jan De Pue");
+host.defineController("JDP", "MPKminiMkII_JDP2", "1.0", "FBE16610-F98F-11E4-B939-0800200C9A66","Jan De Pue");
 host.defineSysexIdentityReply("F0 7E ?? 06 02 00 20 29 03 00 03 00 ?? ?? ?? ?? ?? F7");
-host.addDeviceNameBasedDiscoveryPair(["MPKminiMkII_JDP1"], ["MPKminiMkII_JDP1"]);
+host.addDeviceNameBasedDiscoveryPair(["MPKminiMkII_JDP2"], ["MPKminiMkII_JDP2"]);
 host.defineMidiPorts(1, 1);
 
 
@@ -72,6 +74,10 @@ var moveLimit = 20;
 
 
 var isPlaying = false;	
+var lastCC = -99;
+var visualFeedback_CCMin=11;
+var visualFeedback_CCMax=18;
+var transport_visualFeedback=false;
 
 var padTranslation = initArray(0, 128);
 
@@ -394,8 +400,8 @@ function onMidiPort1(status, data1, data2)
 {
 	////Test Test 
 	//println(status)
-	//println(data2)
 	//println(data1)
+	//println(data2)
 	
 	//Checks if the MIDI data is a CC
 	if (isChannelController(status)) {
@@ -765,6 +771,8 @@ function onMidiPort1(status, data1, data2)
 
 		}
 	}
+	
+	lastCC=data1;
 
 }
 
@@ -810,43 +818,46 @@ function flush()
 		}
 	}
 	
-	//if (armHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD05, isArmOn ? 127 : 0);
-		//armHasChanged = false;
-	//}
-	//if (soloHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD06, isSoloOn ? 127 : 0);
-		//soloHasChanged = false;
-	//}
-	//if (muteHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD07, isMuteOn ? 127 : 0);
-		//muteHasChanged = false;
-	//}
-	//if (playHasChanged)
-	//{
-		//println('playhaschanged')
-		//sendMidi(LEDStatus, LED.PAD02, isPlayingOn ? 127 : 0);
-		//sendMidi(LEDStatus, LED.PAD01, isPlayingOn ? 0 : 127);
-		//playHasChanged = false;
-	//}
-	//if (recordHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD03, isRecordOn ? 127 : 0);
-		//recordHasChanged = false;
-	//}
-	//if (overdubHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD04, isOverdubOn ? 127 : 0);
-		//overdubHasChanged = false;
-	//}
-	//if (clipOVRHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD08, isClipOVROn ? 127 : 0);
-		//clipOVRHasChanged = false;
-	//}
+	if (lastCC>=visualFeedback_CCMin && lastCC<=visualFeedback_CCMin){
+		
+		if (armHasChanged)
+		{
+			sendMidi(LEDStatus, LED.PAD05, isArmOn ? 127 : 0);
+			armHasChanged = false;
+		}
+		if (soloHasChanged)
+		{
+			sendMidi(LEDStatus, LED.PAD06, isSoloOn ? 127 : 0);
+			soloHasChanged = false;
+		}
+		if (muteHasChanged)
+		{
+			sendMidi(LEDStatus, LED.PAD07, isMuteOn ? 127 : 0);
+			muteHasChanged = false;
+		}
+		if (playHasChanged)
+		{
+			println('playhaschanged')
+			sendMidi(LEDStatus, LED.PAD02, isPlayingOn ? 127 : 0);
+			sendMidi(LEDStatus, LED.PAD01, isPlayingOn ? 0 : 127);
+			playHasChanged = false;
+		}
+		if (recordHasChanged)
+		{
+			sendMidi(LEDStatus, LED.PAD03, isRecordOn ? 127 : 0);
+			recordHasChanged = false;
+		}
+		if (overdubHasChanged)
+		{
+			sendMidi(LEDStatus, LED.PAD04, isOverdubOn ? 127 : 0);
+			overdubHasChanged = false;
+		}
+		if (clipOVRHasChanged)
+		{
+			sendMidi(LEDStatus, LED.PAD08, isClipOVROn ? 127 : 0);
+			clipOVRHasChanged = false;
+		}
+	}
 }
 
 // EXIT

@@ -2,8 +2,7 @@
 // MIDI status channels
 CCStatus = 176
 PCStatus = 192
-//LEDStatus = 144
-LEDStatus = null
+LEDStatus = 144
 
 var LED=
 {
@@ -24,10 +23,9 @@ var LED=
 
 var Joystick1 = 
 {
-	LEFT : 0,
-	RIGHT : 1,
-	UP : null,
-	DOWN : null,
+	LR : 0,
+	UP : 1,
+	DOWN : 2,
 };
 
 var Knobs1 =
@@ -86,8 +84,7 @@ var PC1 =
 // MAPPING
 
 // Joystick
-var panningLEFT=Joystick1.LEFT;
-var panningRIGHT=Joystick1.RIGHT;
+var panning=Joystick1.LR;
 var pitchbendUP=Joystick1.UP;
 var pitchbendDOWN=Joystick1.DOWN;
 
@@ -133,6 +130,14 @@ var nextPresetCreator = PC1.PAD11;
 var toggleMacro2 = PC1.PAD016;
 var nextMap2 = PC1.PAD12;
 
+//var previousPreset = PC1.PAD05;
+//var nextPreset = PC1.PAD01;
+//var previousPresetCategory = PC1.PAD06;
+//var nextPresetCategory = PC1.PAD02;
+//var previousPresetCreator = PC1.PAD07;
+//var nextPresetCreator = PC1.PAD03;
+//var toggleMacro2 = PC1.PAD08;
+//var nextMap2 = PC1.PAD04;
 
 // PC & PB B - GUI Navigation
 var note = PC1.PAD01;
@@ -144,16 +149,24 @@ var perspective = PC1.PAD06;
 var project = PC1.PAD07;
 var browser = PC1.PAD08;
 
+//var note = PC1.PAD09;
+//var automation = PC1.PAD10;
+//var mixer = PC1.PAD11;
+//var device = PC1.PAD12;
+//var inspector = PC1.PAD13;
+//var perspective = PC1.PAD14;
+//var project = PC1.PAD15;
+//var browser = PC1.PAD16;
+
 
 
 // ===================== PROGRAM 2 ======================= //
 
 var Joystick2 = 
 {
-	LEFT : 43,
-	RIGHT : 44,
-	UP : 45,
-	DOWN : 46,
+	LR : 50,
+	UP : 51,
+	DOWN : 52,
 };
 
 //var Knobs2 =
@@ -170,22 +183,22 @@ var Joystick2 =
 
 var CC2 =
 {
-	PAD01 : 47,
-	PAD02 : 48,
-	PAD03 : 49,
-	PAD04 : 50,
-	PAD05 : 51,
-	PAD06 : 52,
-	PAD07 : 53,
-	PAD08 : 54,
-	PAD09 : 55,
-	PAD10 : 56,
-	PAD11 : 57,
-	PAD12 : 58,
-	PAD13 : 59,
-	PAD14 : 60,
-	PAD15 : 61,
-	PAD16 : 62,
+	PAD01 : 61,
+	PAD02 : 62,
+	PAD03 : 63,
+	PAD04 : 64,
+	PAD05 : 65,
+	PAD06 : 66,
+	PAD07 : 67,
+	PAD08 : 68,
+	PAD09 : 69,
+	PAD10 : 70,
+	PAD11 : 71,
+	PAD12 : 72,
+	PAD13 : 73,
+	PAD14 : 74,
+	PAD15 : 75,
+	PAD16 : 76
 };
 
 //var PC2 =
@@ -212,11 +225,9 @@ var CC2 =
 // MAPPING
 
 // Joystick
-var moveLEFT=Joystick2.LEFT;
-var moveRIGHT=Joystick2.RIGHT;
-var moveUP=Joystick2.UP;
-var moveDOWN=Joystick2.DOWN;
-
+var panning=Joystick1.LR;
+var pitchbendUP=Joystick1.UP;
+var pitchbendDOWN=Joystick1.DOWN;
 
 ////Knobs: Device Macros
 //var macro1=Knobs1.Knob01
@@ -229,25 +240,26 @@ var moveDOWN=Joystick2.DOWN;
 //var macro8=Knobs1.Knob08
 
 
-// CC & PB A - Transport and Track
-var startSlot00 = CC2.PAD05;
-var startSlot01 = CC2.PAD01;
-var startSlot10 = CC2.PAD06;
-var startSlot11 = CC2.PAD02;
-var startSlot20 = CC2.PAD07;
-var startSlot21 = CC2.PAD03;
-var startSlot30 = CC2.PAD08;
-var startSlot31 = CC2.PAD04;
+// CC & PB A - start slots
+var startSlot1 = CC2.PAD01;
+var startSlot2 = CC2.PAD02;
+var startSlot3 = CC2.PAD03;
+var startSlot4 = CC2.PAD04;
+var startSlot5 = CC2.PAD05;
+var startSlot6 = CC2.PAD06;
+var startSlot7 = CC2.PAD07;
+var startSlot8 = CC2.PAD08;
 
-// CC & PB B - Navigation and Transpose + Mapping
-var delSlot00 = CC2.PAD13;
-var delSlot01 = CC2.PAD09;
-var delSlot10 = CC2.PAD14;
-var delSlot11 = CC2.PAD10;
-var delSlot20 = CC2.PAD15;
-var delSlot21 = CC2.PAD11;
-var delSlot30 = CC2.PAD16;
-var delSlot31 = CC2.PAD12;
+// CC & PB B - stop slots
+varr stopSlot1 = CC2.PAD13;
+var stopSlot2 = CC2.PAD09;
+var stopSlot3 = CC2.PAD14;
+var stopSlot4 = CC2.PAD10;
+var stopSlot5 = CC2.PAD15;
+var stopSlot6 = CC2.PAD11;
+var stopSlot7 = CC2.PAD16;
+var stopSlot8 = CC2.PAD12;
+
 
 //// PC & PB A - Preset Navigation
 //var previousPreset = PC1.PAD05;
@@ -270,3 +282,6 @@ var delSlot31 = CC2.PAD12;
 //var browser = PC1.PAD16;
 
 
+
+// PC & PB 2 - GUI Navigation
+var MagicLoop = 52;

@@ -8,11 +8,13 @@
 
 loadAPI(1); 
 
+load("MPKminiMkII_JDP_HandlersRegistry.js"); // Handlers
 load("MPKminiMkII_JDP_Mapping.js"); // All mapping is done here
+load("MPKminiMkII_JDP_TrackControl.js"); // Clip/Track Controls
 
 // Define the controller
 
-host.defineController("JDP", "MPKminiMkII_JDP1", "1.0", "c790467a-ce30-42d9-8deb-8070a6039c4b","Jan De Pue");
+host.defineController("JDP", "MPKminiMkII_JDP", "1.0", "FBE16610-F98F-11E4-B939-0800200C9A66","Jan De Pue");
 host.defineSysexIdentityReply("F0 7E ?? 06 02 00 20 29 03 00 03 00 ?? ?? ?? ?? ?? F7");
 host.addDeviceNameBasedDiscoveryPair(["MPKminiMkII_JDP1"], ["MPKminiMkII_JDP1"]);
 host.defineMidiPorts(1, 1);
@@ -70,9 +72,6 @@ var isMovingUp = false;
 var isMovingDown = false;
 var moveLimit = 20;
 
-
-var isPlaying = false;	
-
 var padTranslation = initArray(0, 128);
 
 // Pad Translation function
@@ -121,62 +120,6 @@ function getObserverIndexFunc(index, f)
 }
 
 
-
-function selectSlotInBank(trackBank,trackIndex, slotIndex) {
-		println('select')
-		var channel = trackBank.getChannel(trackIndex);
-		var clips = channel.getClipLauncherSlots();
-		clips.select(slotIndex);
-	};
-
-function deleteSlot(trackBank,trackIndex, slotIndex, val) {
-	if(val === 0){
-		println('del')
-		selectSlotInBank(trackBank,trackIndex, slotIndex);
-		application.remove();
-		//application.delete();
-	}
-};
-
-function slot(trackBank, trackIndex, slotIndex, val, transport,isPlaying) {
-		if(val === 0){
-		var _slot = slots[trackIndex].trackSlots[slotIndex];
-		var _track = tracks[trackIndex];
-		
-		select(trackBank, trackIndex, slotIndex);
-		
-		if(!_slot.hasContent) {
-			select(trackBank, trackIndex, slotIndex);
-			//Start rec on transport
-			if(!isPlaying) {
-				transport.play();
-			}
-			_track.record(slotIndex);
-			_track.launch(slotIndex);
-		}
-		else if(_slot.hasContent && !_slot.isQueued && !_slot.isRecording && !_slot.isPlaying) {
-			select(trackBank, trackIndex, slotIndex);
-			_track.launch(slotIndex);
-		}
-		else if(_slot.hasContent && (_slot.isQueued || _slot.isRecording || _slot.isPlaying)) {
-			select(trackBank, trackIndex, slotIndex);
-			var playAfterStop = _slot.isRecording;
-			_track.stop();
-			if(playAfterStop) {
-				_track.launch(slotIndex);
-				_track.showInEditor(slotIndex);
-			}
-		}
-	}
-	};
-
-function select(trackBank, trackIndex, slotIndex) {
-		var _slot = slots[trackIndex].trackSlots[slotIndex];
-		var _track = tracks[trackIndex];
-		_track.select(slotIndex);
-		trackBank.getChannel(trackIndex).select();
-	};
-
 //------------------------------------ Init -----------------------------------//
 function init()
 {
@@ -214,73 +157,13 @@ function init()
 	cursorDevice = cursorTrack.createEditorDeviceSelection(true);
 	
 	track = host.createCursorTrack(2, 0);
-	device = track.getPrimaryDevice();
+	device = track.getPrimaryDevice()
 
-	transport.addIsPlayingObserver(function(value){
-		isPlaying=value;
-		println(isPlaying)
-	});
-	
 	// Track Control
+	var tk = new tk_init.TrackControl(handlersRegistry, host, device, transport, track, application);
+	tk.init()
 	
-	slots=[]
-	
-	trackBank = host.createMainTrackBank(4, 2, tk_init.SCENES_NUM);
-	track0 = trackBank.getChannel(0).getClipLauncherSlots();
-	track1 = trackBank.getChannel(1).getClipLauncherSlots();
-	track2 = trackBank.getChannel(2).getClipLauncherSlots();
-	track3 = trackBank.getChannel(3).getClipLauncherSlots();
-	track0.setIndication(true);
-	track1.setIndication(true);
-	track2.setIndication(true);
-	track3.setIndication(true);
-	
-	tracks=[track0,track1,track2,track3];
 
-	for (var i=0; i<4; i++) {
-		var _trackSlots = [];
-		for (var j=0; j<tk_init.SCENES_NUM; j++) {
-			_trackSlots.push({
-				isSelected: false,
-				hasContent: false,
-				isPlaying: false,
-				isRecording: false,
-				isQueued: false
-			});
-		}
-		slots.push({
-			trackSelected: false,
-			trackSlots: _trackSlots
-		});
-	}
-	
-	for (var k=0; k<4; k++) {
-		function setS(){
-			var _track = tracks[k];
-			var _i = k;
-			trackBank.getChannel(_i).addIsSelectedObserver(function(isSelected){
-				slots[_i].trackSelected = isSelected;
-			});
-			_track.addIsSelectedObserver(function(slotIndex, isSelected){
-				slots[_i].trackSlots[slotIndex].isSelected = isSelected;
-			});
-			_track.addIsPlayingObserver(function(slotIndex, isPlaying){
-				slots[_i].trackSlots[slotIndex].isPlaying = isPlaying;
-			});
-			_track.addHasContentObserver(function(slotIndex, hasContent){
-				slots[_i].trackSlots[slotIndex].hasContent = hasContent;
-			});
-			_track.addIsRecordingObserver(function(slotIndex, isRecording){
-				slots[_i].trackSlots[slotIndex].isRecording = isRecording;
-			});
-			_track.addIsQueuedObserver(function(slotIndex, isQueued){
-				slots[_i].trackSlots[slotIndex].isQueued = isQueued;
-			});
-		};
-		setS();
-	}
-	
-	
 	
 	//-------- Set MIDI callbacks / port
 	host.getMidiInPort(0).setMidiCallback(onMidiPort1);
@@ -593,8 +476,7 @@ function onMidiPort1(status, data1, data2)
 			switch (data1){
 				case moveLEFT:
 					if (!isMovingLeft && data2 > moveLimit){
-						//application.arrowKeyLeft()
-						trackBank.scrollTracksPageUp()
+						application.arrowKeyLeft()
 						isMovingLeft=true;
 					}
 					else if (isMovingLeft && data2<moveLimit){
@@ -603,8 +485,7 @@ function onMidiPort1(status, data1, data2)
 					break;
 				case moveRIGHT:
 					if (!isMovingRight && data2 > moveLimit){
-						//application.arrowKeyRight()
-						trackBank.scrollTracksPageDown()
+						application.arrowKeyRight()
 						isMovingRight=true;
 					}
 					else if (isMovingRight && data2<moveLimit){
@@ -613,8 +494,7 @@ function onMidiPort1(status, data1, data2)
 					break;
 				case moveUP:
 					if (!isMovingUp && data2 > moveLimit){
-						//application.arrowKeyUp()
-						trackBank.scrollScenesPageUp()
+						application.arrowKeyUp()
 						isMovingUp=true;
 					}
 					else if (isMovingUp && data2<moveLimit){
@@ -623,9 +503,7 @@ function onMidiPort1(status, data1, data2)
 					break;
 				case moveDOWN:
 					if (!isMovingDown && data2 > moveLimit){
-						//application.arrowKeyDown()
-						println('down')
-						trackBank.scrollScenesPageDown()
+						application.arrowKeyDown()
 						isMovingDown=true;
 					}
 					else if (isMovingDown && data2<moveLimit){
@@ -634,62 +512,6 @@ function onMidiPort1(status, data1, data2)
 					break;
 			}
 		}
-		
-		// Program II CC slot control
-		else if (data1<62){
-			if (data2===0){
-				switch (data1){
-					case startSlot00:
-						slot(trackBank, 0, 0, data2, transport, isPlaying)
-						break;
-					case startSlot01:
-						slot(trackBank, 0, 1, data2, transport, isPlaying)
-						break;
-					case startSlot10:
-						slot(trackBank, 1, 0, data2, transport, isPlaying)
-						break;
-					case startSlot11:
-						slot(trackBank, 1, 1, data2, transport, isPlaying)
-						break;
-					case startSlot20:
-						slot(trackBank, 2, 0, data2, transport, isPlaying)
-						break;
-					case startSlot21:
-						slot(trackBank, 2, 1, data2, transport, isPlaying)
-						break;
-					case startSlot30:
-						slot(trackBank, 3, 0, data2, transport, isPlaying)
-						break;
-					case startSlot31:
-						slot(trackBank, 3, 1, data2, transport, isPlaying)
-						break;
-					case delSlot00:
-						deleteSlot(trackBank, 0, 0, data2, transport)
-						break;
-					case delSlot01:
-						deleteSlot(trackBank, 0, 1, data2, transport)
-						break;
-					case delSlot10:
-						deleteSlot(trackBank, 1, 0, data2, transport)
-						break;
-					case delSlot11:
-						deleteSlot(trackBank, 1, 1, data2, transport)
-						break;
-					case delSlot20:
-						deleteSlot(trackBank, 2, 0, data2, transport)
-						break;
-					case delSlot21:
-						deleteSlot(trackBank, 2, 1, data2, transport)
-						break;
-					case delSlot30:
-						deleteSlot(trackBank, 3, 0, data2, transport)
-						break;
-					case delSlot31:
-						deleteSlot(trackBank, 3, 1, data2, transport)
-						break;
-					}
-				}
-			}
 	}
 	
 	else if (isProgramChange(status)) {
@@ -810,43 +632,43 @@ function flush()
 		}
 	}
 	
-	//if (armHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD05, isArmOn ? 127 : 0);
-		//armHasChanged = false;
-	//}
-	//if (soloHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD06, isSoloOn ? 127 : 0);
-		//soloHasChanged = false;
-	//}
-	//if (muteHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD07, isMuteOn ? 127 : 0);
-		//muteHasChanged = false;
-	//}
-	//if (playHasChanged)
-	//{
-		//println('playhaschanged')
-		//sendMidi(LEDStatus, LED.PAD02, isPlayingOn ? 127 : 0);
-		//sendMidi(LEDStatus, LED.PAD01, isPlayingOn ? 0 : 127);
-		//playHasChanged = false;
-	//}
-	//if (recordHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD03, isRecordOn ? 127 : 0);
-		//recordHasChanged = false;
-	//}
-	//if (overdubHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD04, isOverdubOn ? 127 : 0);
-		//overdubHasChanged = false;
-	//}
-	//if (clipOVRHasChanged)
-	//{
-		//sendMidi(LEDStatus, LED.PAD08, isClipOVROn ? 127 : 0);
-		//clipOVRHasChanged = false;
-	//}
+	if (armHasChanged)
+	{
+		sendMidi(LEDStatus, LED.PAD05, isArmOn ? 127 : 0);
+		armHasChanged = false;
+	}
+	if (soloHasChanged)
+	{
+		sendMidi(LEDStatus, LED.PAD06, isSoloOn ? 127 : 0);
+		soloHasChanged = false;
+	}
+	if (muteHasChanged)
+	{
+		sendMidi(LEDStatus, LED.PAD07, isMuteOn ? 127 : 0);
+		muteHasChanged = false;
+	}
+	if (playHasChanged)
+	{
+		println('playhaschanged')
+		sendMidi(LEDStatus, LED.PAD02, isPlayingOn ? 127 : 0);
+		sendMidi(LEDStatus, LED.PAD01, isPlayingOn ? 0 : 127);
+		playHasChanged = false;
+	}
+	if (recordHasChanged)
+	{
+		sendMidi(LEDStatus, LED.PAD03, isRecordOn ? 127 : 0);
+		recordHasChanged = false;
+	}
+	if (overdubHasChanged)
+	{
+		sendMidi(LEDStatus, LED.PAD04, isOverdubOn ? 127 : 0);
+		overdubHasChanged = false;
+	}
+	if (clipOVRHasChanged)
+	{
+		sendMidi(LEDStatus, LED.PAD08, isClipOVROn ? 127 : 0);
+		clipOVRHasChanged = false;
+	}
 }
 
 // EXIT
