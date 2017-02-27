@@ -32,14 +32,14 @@ var Joystick1 =
 
 var Knobs1 =
 {
-	Knob01 : 3,
-	Knob02 : 4,
-	Knob03 : 5,
-	Knob04 : 6,
-	Knob05 : 7,
-	Knob06 : 8,
-	Knob07 : 9,
-	Knob08 : 10,
+	Knob01 : 21,
+	Knob02 : 22,
+	Knob03 : 23,
+	Knob04 : 24,
+	Knob05 : 25,
+	Knob06 : 26,
+	Knob07 : 27,
+	Knob08 : 28,
 };
 
 var CC1 =
@@ -54,22 +54,22 @@ var CC1 =
 	PAD08 : 18,
 	PAD09 : 19,
 	PAD10 : 20,
-	PAD11 : 21,
-	PAD12 : 22,
-	PAD13 : 23,
-	PAD14 : 24,
-	PAD15 : 25,
-	PAD16 : 26
+//	PAD11 : 21,
+//	PAD12 : 22,
+//	PAD13 : 23,
+//	PAD14 : 24,
+//	PAD15 : 25,
+//	PAD16 : 26
 };
 
 var PC1 =
 {
-	PAD01 : 27,
-	PAD02 : 28,
-	PAD03 : 29,
-	PAD04 : 30,
-	PAD05 : 31,
-	PAD06 : 32,
+//	PAD01 : 27,
+//	PAD02 : 28,
+//	PAD03 : 29,
+//	PAD04 : 30,
+//	PAD05 : 31,
+//	PAD06 : 32,
 	PAD07 : 33,
 	PAD08 : 34,
 	PAD09 : 35,
@@ -124,13 +124,13 @@ var nextMap = CC1.PAD12;
 
 
 // PC & PB A - Preset Navigation
-var previousPreset = PC1.PAD013;
+var previousPreset = PC1.PAD13;
 var nextPreset = PC1.PAD09;
-var previousPresetCategory = PC1.PAD014;
+var previousPresetCategory = PC1.PAD14;
 var nextPresetCategory = PC1.PAD10;
-var previousPresetCreator = PC1.PAD015;
+var previousPresetCreator = PC1.PAD15;
 var nextPresetCreator = PC1.PAD11;
-var toggleMacro2 = PC1.PAD016;
+var toggleMacro2 = PC1.PAD16;
 var nextMap2 = PC1.PAD12;
 
 
@@ -138,10 +138,10 @@ var nextMap2 = PC1.PAD12;
 var note = PC1.PAD01;
 var automation = PC1.PAD02;
 var mixer = PC1.PAD03;
-var device = PC1.PAD04;
+var devicebutton = PC1.PAD04;
 var inspector = PC1.PAD05;
 var perspective = PC1.PAD06;
-var project = PC1.PAD07;
+var projectbutton = PC1.PAD07;
 var browser = PC1.PAD08;
 
 
