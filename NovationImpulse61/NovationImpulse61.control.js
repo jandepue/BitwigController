@@ -2,7 +2,7 @@
 loadAPI(1); 
 
 load("NovationImpulse61_Mapping.js"); // All mapping is done here
-load("NovationImpulse61_HandlersRegistry.js"); // All mapping is done here
+load("NovationImpulse61_HandlersRegistry.js"); // Handlers
 // load("MPKminiMkII_JDP_TrackControl.js");
 
 // Define the controller
