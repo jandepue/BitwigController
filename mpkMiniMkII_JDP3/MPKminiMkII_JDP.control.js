@@ -14,7 +14,7 @@ load("MPKminiMkII_JDP_TrackControl.js");
 
 // Define the controller
 
-host.defineController("JDP", "MPKminiMkII_JDP2", "1.0", "FBE16610-F98F-11E4-B939-0800200C9A66","Jan De Pue");
+host.defineController("Akai", "MPKminiMkII_JDPv3", "3.0", "FBE16610-F98F-11E4-B939-0800200C9A66","Jan De Pue");
 host.defineSysexIdentityReply("F0 7E ?? 06 02 00 20 29 03 00 03 00 ?? ?? ?? ?? ?? F7");
 host.addDeviceNameBasedDiscoveryPair(["MPKminiMkII_JDP3"], ["MPKminiMkII_JDP3"]);
 host.defineMidiPorts(1, 1);
@@ -56,10 +56,10 @@ var deviceHasChanged = false;
 var trackName = "";
 var trackHasChanged = false;
 
-var isMacroOn = true;
+//var isMacroOn = true;
 var macroHasChanged = false;
-var macro = [];
-var param = [];
+//var macro = [];
+//var param = [];
 var remoteControl = [];
 var nextParameterPageEnabled = true;
 var prevParameterPageEnabled = true;
@@ -100,23 +100,23 @@ function setNoteTable(table, offset) {
 
 
 // Function to toggle the Knobs between Macro and Device Mapping:
-function toggleKnobs () {
-    for ( var p = 0; p < 8; p++)
-    {
-	macro[p].getAmount().setIndication(isMacroOn);
-	param[p].setIndication(!isMacroOn);
-    }
-}
+// function toggleKnobs () {
+//     for ( var p = 0; p < 8; p++)
+//     {
+// 	macro[p].getAmount().setIndication(isMacroOn);
+// 	param[p].setIndication(!isMacroOn);
+//     }
+// }
 
 // Function to deal with the Knobs:
-function getEncoderTarget(knob, val) {
-    if (isMacroOn) {
-	return macro[knob].getAmount().set(val, 128);
-    }
-    else {
-	return param[knob].set(val, 128);
-    }
-}
+// function getEncoderTarget(knob, val) {
+//     if (isMacroOn) {
+// 	return macro[knob].getAmount().set(val, 128);
+//     }
+//     else {
+// 	return param[knob].set(val, 128);
+//     }
+// }
 
 function getObserverIndexFunc(index, f) {
     return function(value)
@@ -211,17 +211,17 @@ function init()
     });
 
     // Knobmode
-    knobModeEnum = ["Macros", "Device Map"];
-    knobMode = docState.getEnumSetting("Knobs", "Settings", knobModeEnum, "Macros");
-    knobMode.addValueObserver(function(value){
-	if (value === "Macros") {
-            isMacroOn = true;
-	}
-	else {
-            isMacroOn = false;
-	}
-	toggleKnobs();
-    });
+ //    knobModeEnum = ["Macros", "Device Map"];
+ //    knobMode = docState.getEnumSetting("Knobs", "Settings", knobModeEnum, "Macros");
+ //    knobMode.addValueObserver(function(value){
+	// if (value === "Macros") {
+ //            isMacroOn = true;
+	// }
+	// else {
+ //            isMacroOn = false;
+	// }
+	// toggleKnobs();
+ //    });
     
     //Creating a view onto our transport.
     handlersRegistry = new HandlersRegistry();
@@ -229,8 +229,8 @@ function init()
     application = host.createApplication();
     cursorTrack = host.createEditorTrackSelection(true,0, 8);
     //cursorDevice = cursorTrack.createEditorDeviceSelection(true);
-    cursorDevice = cursorTrack.createCursorDevice(true);
-    cursorRemoteControl = cursorDevice.createCursorRemoteControlsPage(true);
+    cursorDevice = cursorTrack.createCursorDevice(1);
+    cursorRemoteControl = cursorDevice.createCursorRemoteControlsPage(8);
 
     track = host.createCursorTrack(2, 0);
     device = track.getPrimaryDevice();
@@ -325,7 +325,6 @@ function init()
 //		macro[p].getAmount().setIndication(isMacroOn);
 //		param[p] = cursorDevice.getParameter(p);
 //		param[p].setIndication(!isMacroOn);
-		println(cursorDevice.name())
 		remoteControl[p] = cursorRemoteControl.getParameter(p);
     }
     
@@ -360,23 +359,24 @@ function init()
 		clipOVRHasChanged = true;
     });
 
-    cursorDevice.addSelectedPageObserver(0, function(on){
-		paraPage = on;
-    })
+  //   cursorDevice.addSelectedPageObserver(0, function(on){
+		// paraPage = on;
+  //   })
 
-    cursorDevice.addNextParameterPageEnabledObserver(function(on){
-		nextParameterPageEnabled = on;
-    })
+  //   cursorDevice.addNextParameterPageEnabledObserver(function(on){
+		// nextParameterPageEnabled = on;
+  //   })
 
-    cursorDevice.addPreviousParameterPageEnabledObserver(function(on){
-		prevParameterPageEnabled = on;
-    })
+  //   cursorDevice.addPreviousParameterPageEnabledObserver(function(on){
+		// prevParameterPageEnabled = on;
+  //   })
 
     for ( var p = 0; p < 8; p++) {
-		macro[p] = cursorDevice.getMacro(p);
-		macro[p].getAmount().setIndication(isMacroOn);
-		param[p] = cursorDevice.getParameter(p);
-		param[p].setIndication(!isMacroOn);
+		// macro[p] = cursorDevice.getMacro(p);
+		// macro[p].getAmount().setIndication(isMacroOn);
+		// param[p] = cursorDevice.getParameter(p);
+		// param[p].setIndication(!isMacroOn);
+		remoteControl[p] = cursorRemoteControl.getParameter(p);
     }
 
     //// Show the Bitwig Logo on the Pads :-)
@@ -404,8 +404,8 @@ function init()
 
 function onMidiPort1(status, data1, data2) {
     ////Test Test 
-    println(status)
-    println(data1)
+    // println(status)
+    // println(data1)
     //println(data2)
     
     //Checks if the MIDI data is a CC
@@ -425,36 +425,28 @@ function onMidiPort1(status, data1, data2) {
 	    
 	    switch (data1) {
 	    case macro1:
-		getEncoderTarget(0, data2);
-		//macro[0].getAmount().set(data2, 128);
+		cursorRemoteControl.getParameter(0).getAmount().value().set(data2, 128);
 		break;
 	    case macro2:
-		getEncoderTarget(1, data2);
-		//macro[0].getAmount().set(data2, 128);
+		cursorRemoteControl.getParameter(1).getAmount().value().set(data2, 128);
 		break;
 	    case macro3:
-		getEncoderTarget(2, data2);
-		//macro[0].getAmount().set(data2, 128);
+		cursorRemoteControl.getParameter(2).getAmount().value().set(data2, 128);
 		break;
 	    case macro4:
-		getEncoderTarget(3, data2);
-		//macro[0].getAmount().set(data2, 128);
+		cursorRemoteControl.getParameter(3).getAmount().value().set(data2, 128);
 		break;
 	    case macro5:
-		getEncoderTarget(4, data2);
-		//macro[0].getAmount().set(data2, 128);
+		cursorRemoteControl.getParameter(4).getAmount().value().set(data2, 128);
 		break;
 	    case macro6:
-		getEncoderTarget(5, data2);
-		//macro[0].getAmount().set(data2, 128);
+		cursorRemoteControl.getParameter(5).getAmount().value().set(data2, 128);
 		break;
 	    case macro7:
-		getEncoderTarget(6, data2);
-		//macro[0].getAmount().set(data2, 128);
+		cursorRemoteControl.getParameter(6).getAmount().value().set(data2, 128);
 		break;
 	    case macro8:
-		getEncoderTarget(7, data2);
-		//macro[0].getAmount().set(data2, 128);
+		cursorRemoteControl.getParameter(7).getAmount().value().set(data2, 128);
 		break;
 	    }
 	}
@@ -569,26 +561,10 @@ function onMidiPort1(status, data1, data2) {
 		    showParameter = "padshift";
 		    break;
 		case toggleMacro:
-		    isMacroOn = !isMacroOn;
-		    if (isMacroOn) {
-			knobMode.set(knobModeEnum[0]);
-		    }
-		    else {
-			knobMode.set(knobModeEnum[1]);
-		    }
-		    toggleKnobs();
-		    macroHasChanged = true;
-		    showParameter = "macro";
+		    cursorRemoteControl.selectPreviousPage(true);
 		    break;
 		case nextMap:
-		    if (!isMacroOn) {
-			if (!nextParameterPageEnabled) {
-			    cursorDevice.setParameterPage(0);
-			}
-			else {
-			    cursorDevice.nextParameterPage();
-			}
-		    }
+		    cursorRemoteControl.selectNextPage(true);
 		    break;
 		}
 	    }
@@ -729,21 +705,10 @@ function onMidiPort1(status, data1, data2) {
 	    creatorHasChanged = true;
 	    break;
 	case toggleMacro2:
-	    isMacroOn = !isMacroOn;
-	    if (isMacroOn) {
-		knobMode.set(knobModeEnum[0]);
-	    }
-	    else {
-		knobMode.set(knobModeEnum[1]);
-	    }
-	    toggleKnobs();
-	    macroHasChanged = true;
-	    showParameter = "macro";
+	    cursorRemoteControl.selectPreviousPage(true);
 	    break;
 	case nextMap2:
-	    if (!isMacroOn) {
-		nextParameterPageEnabled ? cursorDevice.nextParameterPage() : cursorDevice.setParameterPage(0);
-	    }
+	    cursorRemoteControl.selectNextPage(true);
 	    break;
 
 	    // PC & PB 2
