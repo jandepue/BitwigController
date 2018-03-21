@@ -593,7 +593,7 @@ function onMidiPort1(status, data1, data2) {
 			case projectbutton:
 			    application.nextProject();
 			    break;
-			case browser:
+			case browserVisible:
 			    application.toggleBrowserVisibility();
 			    break;
 			case note:
@@ -602,11 +602,11 @@ function onMidiPort1(status, data1, data2) {
 			case automation:
 			    application.toggleAutomationEditor();
 			    break;
-			case mixer:
-			    application.toggleMixer();
-			    break;
 			case devicebutton:
 			    application.toggleDevices();
+			    break;
+			case mixer:
+			    application.toggleMixer();
 			    break;
 		}
 	}

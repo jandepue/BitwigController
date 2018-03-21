@@ -129,12 +129,12 @@ var nextRC = CC1.PAD12;
 // PC & PB A - GUI Navigation
 var note = PC1.PAD01;
 var automation = PC1.PAD02;
-var mixer = PC1.PAD03;
-var devicebutton = PC1.PAD04;
+var devicebutton = PC1.PAD03;
+var mixer = PC1.PAD04;
 var inspector = PC1.PAD05;
 var perspective = PC1.PAD06;
 var projectbutton = PC1.PAD07;
-var browser = PC1.PAD08;
+var browserVisible = PC1.PAD08;
 
 
 // PC & PB B - Preset Navigation
