@@ -9,8 +9,8 @@
 loadAPI(6); 
 
 load("MPKminiMkII_JDP_Mapping.js"); // All mapping is done here
-load("MPKminiMkII_JDP_HandlersRegistry.js"); // All mapping is done here
-load("MPKminiMkII_JDP_TrackControl.js");
+//load("MPKminiMkII_JDP_HandlersRegistry.js"); // All mapping is done here
+//load("MPKminiMkII_JDP_TrackControl.js");
 
 // Define the controller
 
@@ -92,100 +92,19 @@ function setNoteTable(table, offset) {
 	    table[i] = -1;
 	}
     }
-    //println(offset)
-    //println(padTranslation)
     MPKminiPads.setKeyTranslationTable(padTranslation);
-    //padTrans.set(Math.floor(offset/8),1);
 }
-
-
-// Function to toggle the Knobs between Macro and Device Mapping:
-// function toggleKnobs () {
-//     for ( var p = 0; p < 8; p++)
-//     {
-// 	macro[p].getAmount().setIndication(isMacroOn);
-// 	param[p].setIndication(!isMacroOn);
-//     }
-// }
-
-// Function to deal with the Knobs:
-// function getEncoderTarget(knob, val) {
-//     if (isMacroOn) {
-// 	return macro[knob].getAmount().set(val, 128);
-//     }
-//     else {
-// 	return param[knob].set(val, 128);
-//     }
-// }
-
-function getObserverIndexFunc(index, f) {
-    return function(value)
-    {
-	f(index, value);
-    };
-}
-
-
-
-function selectSlotInBank(trackBank,trackIndex, slotIndex) {
-    println('select')
-    var channel = trackBank.getChannel(trackIndex);
-    var clips = channel.getClipLauncherSlots();
-    clips.select(slotIndex);
-};
-
-function deleteSlot(trackBank,trackIndex, slotIndex, val) {
-    if(val === 0){
-	println('del')
-	selectSlotInBank(trackBank,trackIndex, slotIndex);
-	application.remove();
-	//application.delete();
-    }
-};
-
-function slot(trackBank, trackIndex, slotIndex, val, transport,isPlaying) {
-    if(val === 0){
-	var _slot = slots[trackIndex].trackSlots[slotIndex];
-	var _track = tracks[trackIndex];
-	
-	select(trackBank, trackIndex, slotIndex);
-	
-	if(!_slot.hasContent) {
-	    select(trackBank, trackIndex, slotIndex);
-	    //Start rec on transport
-	    if(!isPlaying) {
-		transport.play();
-	    }
-	    _track.record(slotIndex);
-	    _track.launch(slotIndex);
-	}
-	else if(_slot.hasContent && !_slot.isQueued && !_slot.isRecording && !_slot.isPlaying) {
-	    select(trackBank, trackIndex, slotIndex);
-	    _track.launch(slotIndex);
-	}
-	else if(_slot.hasContent && (_slot.isQueued || _slot.isRecording || _slot.isPlaying)) {
-	    select(trackBank, trackIndex, slotIndex);
-	    var playAfterStop = _slot.isRecording;
-	    _track.stop();
-	    if(playAfterStop) {
-		_track.launch(slotIndex);
-		_track.showInEditor(slotIndex);
-	    }
-	}
-    }
-};
-
-function select(trackBank, trackIndex, slotIndex) {
-    var _slot = slots[trackIndex].trackSlots[slotIndex];
-    var _track = tracks[trackIndex];
-    _track.select(slotIndex);
-    trackBank.getChannel(trackIndex).select();
-};
 
 //------------------------------------ Init -----------------------------------//
 function init()
 {
-    
+    println("=== Initialize Controller ===")
+   // Show the Bitwig Logo on the Pads :-)
+    sendNoteOn(LEDStatus, LED.PAD01, 127);
+    sendNoteOn(LEDStatus, LED.PAD06, 127);
+    sendNoteOn(LEDStatus, LED.PAD07, 127); 
+    sendNoteOn(LEDStatus, LED.PAD04, 127);
+
     // Create Preferences, DocState and Visual Notifications:
     docState = host.getDocumentState();
     prefs = host.getPreferences();
@@ -210,94 +129,81 @@ function init()
 		}
     });
 
-    // Knobmode
- //    knobModeEnum = ["Macros", "Device Map"];
- //    knobMode = docState.getEnumSetting("Knobs", "Settings", knobModeEnum, "Macros");
- //    knobMode.addValueObserver(function(value){
-	// if (value === "Macros") {
- //            isMacroOn = true;
-	// }
-	// else {
- //            isMacroOn = false;
-	// }
-	// toggleKnobs();
- //    });
-    
     //Creating a view onto our transport.
-    handlersRegistry = new HandlersRegistry();
+//    handlersRegistry = new HandlersRegistry();
     transport = host.createTransport();
     application = host.createApplication();
     cursorTrack = host.createEditorTrackSelection(true,0, 8);
-    //cursorDevice = cursorTrack.createEditorDeviceSelection(true);
-    cursorDevice = cursorTrack.createCursorDevice(1);
+    cursorDevice = host.createEditorCursorDevice();
     cursorRemoteControl = cursorDevice.createCursorRemoteControlsPage(8);
+    browser = cursorDevice.createDeviceBrowser(1,1);
+    popupBrowser = host.createPopupBrowser();
 
     track = host.createCursorTrack(2, 0);
     device = track.getPrimaryDevice();
 
     transport.addIsPlayingObserver(function(value){
 	isPlaying=value;
-	println(isPlaying)
+	// println(isPlaying)
     });
     
     // Track Control
     
-    slots=[]
+ //    slots=[]
     
-    trackBank = host.createMainTrackBank(4, 2, tk_init.SCENES_NUM);
-    track0 = trackBank.getChannel(0).getClipLauncherSlots();
-    track1 = trackBank.getChannel(1).getClipLauncherSlots();
-    track2 = trackBank.getChannel(2).getClipLauncherSlots();
-    track3 = trackBank.getChannel(3).getClipLauncherSlots();
-    track0.setIndication(true);
-    track1.setIndication(true);
-    track2.setIndication(true);
-    track3.setIndication(true);
-    
-    tracks=[track0,track1,track2,track3];
+ //    trackBank = host.createMainTrackBank(4, 2, tk_init.SCENES_NUM);
+ //    track0 = trackBank.getChannel(0).getClipLauncherSlots();
+ //    track1 = trackBank.getChannel(1).getClipLauncherSlots();
+ //    track2 = trackBank.getChannel(2).getClipLauncherSlots();
+ //    track3 = trackBank.getChannel(3).getClipLauncherSlots();
+ //    track0.setIndication(true);
+ //    track1.setIndication(true);
+ //    track2.setIndication(true);
+ //    track3.setIndication(true);
+ //    tracks=[track0,track1,track2,track3];
 
-    for (var i=0; i<4; i++) {
-		var _trackSlots = [];
-		for (var j=0; j<tk_init.SCENES_NUM; j++) {
-		    _trackSlots.push({
-			isSelected: false,
-			hasContent: false,
-			isPlaying: false,
-			isRecording: false,
-			isQueued: false
-		    });
-		}
-		slots.push({
-		    trackSelected: false,
-		    trackSlots: _trackSlots
-		});
-    }
+ //    for (var i=0; i<4; i++) {
+	// 	var _trackSlots = [];
+	// 	for (var j=0; j<tk_init.SCENES_NUM; j++) {
+	// 	    _trackSlots.push({
+	// 		isSelected: false,
+	// 		hasContent: false,
+	// 		isPlaying: false,
+	// 		isRecording: false,
+	// 		isQueued: false
+	// 	    });
+	// 	}
+	// 	slots.push({
+	// 	    trackSelected: false,
+	// 	    trackSlots: _trackSlots
+	// 	});
+ //    }
     
-    for (var k=0; k<4; k++) {
-	function setS(){
-	    var _track = tracks[k];
-	    var _i = k;
-	    trackBank.getChannel(_i).addIsSelectedObserver(function(isSelected){
-			slots[_i].trackSelected = isSelected;
-	    });
-	    _track.addIsSelectedObserver(function(slotIndex, isSelected){
-			slots[_i].trackSlots[slotIndex].isSelected = isSelected;
-	    });
-	    _track.addIsPlayingObserver(function(slotIndex, isPlaying){
-			slots[_i].trackSlots[slotIndex].isPlaying = isPlaying;
-	    });
-	    _track.addHasContentObserver(function(slotIndex, hasContent){
-			slots[_i].trackSlots[slotIndex].hasContent = hasContent;
-	    });
-	    _track.addIsRecordingObserver(function(slotIndex, isRecording){
-			slots[_i].trackSlots[slotIndex].isRecording = isRecording;
-	    });
-	    _track.addIsQueuedObserver(function(slotIndex, isQueued){
-			slots[_i].trackSlots[slotIndex].isQueued = isQueued;
-	    });
-	};
-	setS();
-    }
+ //    for (var k=0; k<4; k++) {
+	// function setS(){
+	//     var _track = tracks[k];
+	//     var _i = k;
+	//     trackBank.getChannel(_i).addIsSelectedObserver(function(isSelected){
+	// 		slots[_i].trackSelected = isSelected;
+	//     });
+	//     _track.addIsSelectedObserver(function(slotIndex, isSelected){
+	// 		slots[_i].trackSlots[slotIndex].isSelected = isSelected;
+	//     });
+	//     _track.addIsPlayingObserver(function(slotIndex, isPlaying){
+	// 		slots[_i].trackSlots[slotIndex].isPlaying = isPlaying;
+	//     });
+	//     _track.addHasContentObserver(function(slotIndex, hasContent){
+	// 		slots[_i].trackSlots[slotIndex].hasContent = hasContent;
+	//     });
+	//     _track.addIsRecordingObserver(function(slotIndex, isRecording){
+	// 		slots[_i].trackSlots[slotIndex].isRecording = isRecording;
+	//     });
+	//     _track.addIsQueuedObserver(function(slotIndex, isQueued){
+	// 		slots[_i].trackSlots[slotIndex].isQueued = isQueued;
+	//     });
+	// };
+	// setS();
+ //    }
     
     
     
@@ -321,43 +227,39 @@ function init()
 
     // Initialize macro and device parameters
     for ( var p = 0; p < 8; p++) {
-//		macro[p] = cursorDevice.getMacro(p); // DEPRECATED
-//		macro[p].getAmount().setIndication(isMacroOn);
-//		param[p] = cursorDevice.getParameter(p);
-//		param[p].setIndication(!isMacroOn);
 		remoteControl[p] = cursorRemoteControl.getParameter(p);
     }
     
-    // Setup Views and Callbacks:
-    cursorTrack.getSolo().addValueObserver(function(on) {
-		isSoloOn = on;
-		soloHasChanged = true;
-    });
-    cursorTrack.getArm().addValueObserver(function(on) {
-		isArmOn = on;
-		armHasChanged = true;
-    });
-    cursorTrack.getMute().addValueObserver(function(on) {
-		isMuteOn = on;
-		muteHasChanged = true;
-    });
+  //   // Setup Views and Callbacks:
+  //   cursorTrack.getSolo().addValueObserver(function(on) {
+		// isSoloOn = on;
+		// soloHasChanged = true;
+  //   });
+  //   cursorTrack.getArm().addValueObserver(function(on) {
+		// isArmOn = on;
+		// armHasChanged = true;
+  //   });
+  //   cursorTrack.getMute().addValueObserver(function(on) {
+		// isMuteOn = on;
+		// muteHasChanged = true;
+  //   });
 
-    transport.addIsPlayingObserver(function(on) {
-		isPlayingOn = on;
-		playHasChanged = true;
-    });
-    transport.addIsRecordingObserver(function(on) {
-		isRecordOn = on;
-		recordHasChanged = true;
-    });
-    transport.addOverdubObserver(function(on) {
-		isOverdubOn = on;
-		overdubHasChanged = true;
-    });
-    transport.addLauncherOverdubObserver(function(on) {
-		isClipOVROn = on;
-		clipOVRHasChanged = true;
-    });
+  //   transport.addIsPlayingObserver(function(on) {
+		// isPlayingOn = on;
+		// playHasChanged = true;
+  //   });
+  //   transport.addIsRecordingObserver(function(on) {
+		// isRecordOn = on;
+		// recordHasChanged = true;
+  //   });
+  //   transport.addOverdubObserver(function(on) {
+		// isOverdubOn = on;
+		// overdubHasChanged = true;
+  //   });
+  //   transport.addLauncherOverdubObserver(function(on) {
+		// isClipOVROn = on;
+		// clipOVRHasChanged = true;
+  //   });
 
   //   cursorDevice.addSelectedPageObserver(0, function(on){
 		// paraPage = on;
@@ -379,11 +281,11 @@ function init()
 		remoteControl[p] = cursorRemoteControl.getParameter(p);
     }
 
-    //// Show the Bitwig Logo on the Pads :-)
-    //sendNoteOn(LEDStatus, LED.PAD01, 127);
-    //sendNoteOn(LEDStatus, LED.PAD06, 127);
-    //sendNoteOn(LEDStatus, LED.PAD07, 127); 
-    //sendNoteOn(LEDStatus, LED.PAD04, 127);
+    // Turn off the lights
+    sendNoteOn(LEDStatus, LED.PAD01, 0);
+    sendNoteOn(LEDStatus, LED.PAD06, 0);
+    sendNoteOn(LEDStatus, LED.PAD07, 0); 
+    sendNoteOn(LEDStatus, LED.PAD04, 0);
     
     ////// testing
     //// status byte for controller led : 144
@@ -391,12 +293,13 @@ function init()
     //// pad 1 - 8: data1 9 - 17
     //// bandAB, CC, PC : data1 17 - 20
     
-    ////for (i = 144; i < 145; i++) {
-    ////println(i)
-    ////for (j = 130; j < 140 ; j++) { 
-    ////sendMidi(i, j, 127);
-    ////}
-    ////}
+    // for (i = 144; i < 145; i++) 
+    // {
+	   //  println(i)
+    // 	for (j = 130; j < 140 ; j++) { 
+    // 	sendNoteOn(i, LED.PAD04, 127)
+    // 	}
+    // }
 }
 
 
@@ -410,338 +313,304 @@ function onMidiPort1(status, data1, data2) {
     
     //Checks if the MIDI data is a CC
     if (isChannelController(status)) {
-	
-	// Joystick
-	//if (data1 == panning){
-	
-	//}
-	//if (data1 == pitchbend){
-	
-	//}
-	
-	
-	// Macro knobs
-	if (data1<11) {
-	    
-	    switch (data1) {
-	    case macro1:
-		cursorRemoteControl.getParameter(0).getAmount().value().set(data2, 128);
-		break;
-	    case macro2:
-		cursorRemoteControl.getParameter(1).getAmount().value().set(data2, 128);
-		break;
-	    case macro3:
-		cursorRemoteControl.getParameter(2).getAmount().value().set(data2, 128);
-		break;
-	    case macro4:
-		cursorRemoteControl.getParameter(3).getAmount().value().set(data2, 128);
-		break;
-	    case macro5:
-		cursorRemoteControl.getParameter(4).getAmount().value().set(data2, 128);
-		break;
-	    case macro6:
-		cursorRemoteControl.getParameter(5).getAmount().value().set(data2, 128);
-		break;
-	    case macro7:
-		cursorRemoteControl.getParameter(6).getAmount().value().set(data2, 128);
-		break;
-	    case macro8:
-		cursorRemoteControl.getParameter(7).getAmount().value().set(data2, 128);
-		break;
-	    }
-	}
-	
-	// CC PADS
-	
-	else if (data1<43) {
-	    switch (data1) {
 		
-		// CC & PB 1
-	    case stop:
-		transport.stop();
-		showParameter = "stop";
-		break;
-	    case play:
-		println('play')
-		transport.play();
-		showParameter = "play";
-		break;
-	    case rec:
-		transport.record();
-		showParameter = "record";
-		break;
-	    case od:
-		transport.toggleOverdub();
-		showParameter = "ovr";
-		break;
-	    case toggleArmCursorTrack:
-		cursorTrack.getArm().toggle();
-		showParameter = "arm";
-		break;
-	    case toggleSoloCursorTrack:
-		cursorTrack.getSolo().toggle();
-		showParameter = "solo";
-		break;
-	    case toggleMuteCursorTrack:
-		cursorTrack.getMute().toggle();
-		showParameter = "mute";
-		break;
-	    case clipOVR:
-		transport.toggleLauncherOverdub();
-		showParameter = "clipovr";
-		break;
+		// Joystick
+		//if (data1 == panning){
 		
-	    }
-	    
-	    if (data2 == 0) { // do sth when button released
+		//}
+		//if (data1 == pitchbend){
 		
-		//println('you released a button')
-		// These are workarounds for the fact that the pads overwrite their lighted state on release
-		// So we have to re-send the light on message when the button is released...
-		switch (data1) {
-		case toggleArmCursorTrack:
-		    armHasChanged = true;
-		    break;		    
-		case toggleSoloCursorTrack:
-		    soloHasChanged = true;
-		    break;
-		case toggleMuteCursorTrack:
-		    muteHasChanged = true;
-		    break;
-		case play:
-		    playHasChanged = true;
-		    break;
-		case rec:
-		    recordHasChanged = true;
-		    break;
-		case od:
-		    overdubHasChanged = true;
-		    break;
-		case clipOVR:
-		    clipOVRHasChanged = true;
-		    break;
-		    
-		    // CC & PB 2  Should be only executed on release
-		case devPageUp:
-		    cursorDevice.selectPrevious();
-		    deviceHasChanged = true;
-		    paraPage = 0;
-		    paraPage = 42;
-		    break;
-		case devPageDown:
-		    cursorDevice.selectNext();
-		    deviceHasChanged = true;
-		    paraPage = 0;
-		    paraPage = 42;
-		    break;
-		case cursorTrackUp:
-		    cursorTrack.selectPrevious();
-		    trackHasChanged = true;
-		    break;
-		case cursorTrackDown:
-		    cursorTrack.selectNext();
-		    trackHasChanged = true;
-		    break;
-		case shiftPadsUp:
-		    if (padShift < 88){
-			padShift += 8;
-			println(padShift)
-			setNoteTable(padTranslation, padShift);
+		//}
+		
+		
+		// Macro knobs
+		if (data1<11) {	    
+		    switch (data1) {
+		    case macro1:
+				cursorRemoteControl.getParameter(0).getAmount().value().set(data2, 128);
+				break;
+		    case macro2:
+				cursorRemoteControl.getParameter(1).getAmount().value().set(data2, 128);
+				break;
+		    case macro3:
+				cursorRemoteControl.getParameter(2).getAmount().value().set(data2, 128);
+				break;
+		    case macro4:
+				cursorRemoteControl.getParameter(3).getAmount().value().set(data2, 128);
+				break;
+		    case macro5:
+				cursorRemoteControl.getParameter(4).getAmount().value().set(data2, 128);
+				break;
+		    case macro6:
+				cursorRemoteControl.getParameter(5).getAmount().value().set(data2, 128);
+				break;
+		    case macro7:
+				cursorRemoteControl.getParameter(6).getAmount().value().set(data2, 128);
+				break;
+		    case macro8:
+				cursorRemoteControl.getParameter(7).getAmount().value().set(data2, 128);
+				break;
 		    }
-		    padshiftHasChanged = true;
-		    showParameter = "padshift";
-		    break;
-		case shiftPadsDown:
-		    if (padShift > -40){						
-			padShift -= 8;
-			println(padShift)
-			setNoteTable(padTranslation, padShift);
+		}
+		
+		// CC PADS
+		
+		else if (data1<43) {
+			if (data2>20) { // a button is pushed
+				switch (data1) {
+				// CC & PB A
+			    case stop:
+					transport.stop();
+					showParameter = "stop";
+					break;
+			    case play:
+					transport.play();
+					showParameter = "play";
+					break;
+			    case rec:
+					transport.record();
+					showParameter = "record";
+					break;
+				case cursorTrackDown:
+				    cursorTrack.selectNext();
+				    trackHasChanged = true;
+				    break;
+			    case toggleArmCursorTrack:
+					cursorTrack.getArm().toggle();
+					showParameter = "arm";
+					break;
+			    case toggleSoloCursorTrack:
+					cursorTrack.getSolo().toggle();
+					showParameter = "solo";
+					break;
+			    case toggleMuteCursorTrack:
+					cursorTrack.getMute().toggle();
+					showParameter = "mute";
+					break;
+				case cursorTrackUp:
+			   		cursorTrack.selectPrevious();
+				    trackHasChanged = true;
+			    	break;
+
+				// CC & PB B
+				case tapTempo:
+					transport.tapTempo();
+					break
+			    }
+			}
+		    if (data2 == 0) { // do sth when button released
+			
+			// These are workarounds for the fact that the pads overwrite their lighted state on release
+			// So we have to re-send the light on message when the button is released...
+				switch (data1) {
+				case toggleArmCursorTrack:
+				    armHasChanged = true;
+				    break;		    
+				case toggleSoloCursorTrack:
+				    soloHasChanged = true;
+				    break;
+				case toggleMuteCursorTrack:
+				    muteHasChanged = true;
+				    break;
+				case play:
+				    playHasChanged = true;
+				    break;
+				case rec:
+				    recordHasChanged = true;
+				    break;
+				    
+				 // CC & PB 2  Should be only executed on release
+
+				case shiftPadsUp:
+				    if (padShift < 88){
+					padShift += 8;
+					println(padShift)
+					setNoteTable(padTranslation, padShift);
+				    }
+				    padshiftHasChanged = true;
+				    showParameter = "padshift";
+				    break;
+				case shiftPadsDown:
+				    if (padShift > -40){						
+					padShift -= 8;
+					println(padShift)
+					setNoteTable(padTranslation, padShift);
+				    }
+				    padshiftHasChanged = true;
+				    showParameter = "padshift";
+				    break;
+				case previousRC:
+				    cursorRemoteControl.selectPreviousPage(true);
+				    break;
+				case nextRC:
+				    cursorRemoteControl.selectNextPage(true);
+				    break;
+				}
 		    }
-		    padshiftHasChanged = true;
-		    showParameter = "padshift";
-		    break;
-		case toggleMacro:
-		    cursorRemoteControl.selectPreviousPage(true);
-		    break;
-		case nextMap:
-		    cursorRemoteControl.selectNextPage(true);
-		    break;
 		}
-	    }
-	    
-	    
-	}
-	
-	// Program II joystick
-	else if (data1<47){
-	    switch (data1){
-	    case moveLEFT:
-		if (!isMovingLeft && data2 > moveLimit){
-		    //application.arrowKeyLeft()
-		    trackBank.scrollTracksPageUp()
-		    isMovingLeft=true;
+		
+		// Program II joystick
+		else if (data1<47){
+		    switch (data1){
+		    case moveLEFT:
+				if (!isMovingLeft && data2 > moveLimit){
+				    //application.arrowKeyLeft()
+				    trackBank.scrollTracksPageUp()
+				    isMovingLeft=true;
+				}
+				else if (isMovingLeft && data2<moveLimit){
+				    isMovingLeft=false;
+				}
+				break;
+		    case moveRIGHT:
+				if (!isMovingRight && data2 > moveLimit){
+				    //application.arrowKeyRight()
+				    trackBank.scrollTracksPageDown()
+				    isMovingRight=true;
+				}
+				else if (isMovingRight && data2<moveLimit){
+				    isMovingRight=false;
+				}
+				break;
+		    case moveUP:
+				if (!isMovingUp && data2 > moveLimit){
+				    //application.arrowKeyUp()
+				    trackBank.scrollScenesPageUp()
+				    isMovingUp=true;
+				}
+				else if (isMovingUp && data2<moveLimit){
+				    isMovingUp=false;
+				}
+				break;
+		    case moveDOWN:
+				if (!isMovingDown && data2 > moveLimit){
+				    //application.arrowKeyDown()
+				    println('down')
+				    trackBank.scrollScenesPageDown()
+				    isMovingDown=true;
+				}
+				else if (isMovingDown && data2<moveLimit){
+				    isMovingDown=false;
+				}
+				break;
+		    }
 		}
-		else if (isMovingLeft && data2<moveLimit){
-		    isMovingLeft=false;
+		
+		// Program II CC slot control
+		else if (data1<62){
+		    if (data2===0){
+				switch (data1){
+				case startSlot00:
+				    slot(trackBank, 0, 0, data2, transport, isPlaying)
+				    break;
+				case startSlot01:
+				    slot(trackBank, 0, 1, data2, transport, isPlaying)
+				    break;
+				case startSlot10:
+				    slot(trackBank, 1, 0, data2, transport, isPlaying)
+				    break;
+				case startSlot11:
+				    slot(trackBank, 1, 1, data2, transport, isPlaying)
+				    break;
+				case startSlot20:
+				    slot(trackBank, 2, 0, data2, transport, isPlaying)
+				    break;
+				case startSlot21:
+				    slot(trackBank, 2, 1, data2, transport, isPlaying)
+				    break;
+				case startSlot30:
+				    slot(trackBank, 3, 0, data2, transport, isPlaying)
+				    break;
+				case startSlot31:
+				    slot(trackBank, 3, 1, data2, transport, isPlaying)
+				    break;
+				case delSlot00:
+				    deleteSlot(trackBank, 0, 0, data2, transport)
+				    break;
+				case delSlot01:
+				    deleteSlot(trackBank, 0, 1, data2, transport)
+				    break;
+				case delSlot10:
+				    deleteSlot(trackBank, 1, 0, data2, transport)
+				    break;
+				case delSlot11:
+				    deleteSlot(trackBank, 1, 1, data2, transport)
+				    break;
+				case delSlot20:
+				    deleteSlot(trackBank, 2, 0, data2, transport)
+				    break;
+				case delSlot21:
+				    deleteSlot(trackBank, 2, 1, data2, transport)
+				    break;
+				case delSlot30:
+				    deleteSlot(trackBank, 3, 0, data2, transport)
+				    break;
+				case delSlot31:
+				    deleteSlot(trackBank, 3, 1, data2, transport)
+				    break;
+				}
+		    }
 		}
-		break;
-	    case moveRIGHT:
-		if (!isMovingRight && data2 > moveLimit){
-		    //application.arrowKeyRight()
-		    trackBank.scrollTracksPageDown()
-		    isMovingRight=true;
-		}
-		else if (isMovingRight && data2<moveLimit){
-		    isMovingRight=false;
-		}
-		break;
-	    case moveUP:
-		if (!isMovingUp && data2 > moveLimit){
-		    //application.arrowKeyUp()
-		    trackBank.scrollScenesPageUp()
-		    isMovingUp=true;
-		}
-		else if (isMovingUp && data2<moveLimit){
-		    isMovingUp=false;
-		}
-		break;
-	    case moveDOWN:
-		if (!isMovingDown && data2 > moveLimit){
-		    //application.arrowKeyDown()
-		    println('down')
-		    trackBank.scrollScenesPageDown()
-		    isMovingDown=true;
-		}
-		else if (isMovingDown && data2<moveLimit){
-		    isMovingDown=false;
-		}
-		break;
-	    }
-	}
-	
-	// Program II CC slot control
-	else if (data1<62){
-	    if (data2===0){
-		switch (data1){
-		case startSlot00:
-		    slot(trackBank, 0, 0, data2, transport, isPlaying)
-		    break;
-		case startSlot01:
-		    slot(trackBank, 0, 1, data2, transport, isPlaying)
-		    break;
-		case startSlot10:
-		    slot(trackBank, 1, 0, data2, transport, isPlaying)
-		    break;
-		case startSlot11:
-		    slot(trackBank, 1, 1, data2, transport, isPlaying)
-		    break;
-		case startSlot20:
-		    slot(trackBank, 2, 0, data2, transport, isPlaying)
-		    break;
-		case startSlot21:
-		    slot(trackBank, 2, 1, data2, transport, isPlaying)
-		    break;
-		case startSlot30:
-		    slot(trackBank, 3, 0, data2, transport, isPlaying)
-		    break;
-		case startSlot31:
-		    slot(trackBank, 3, 1, data2, transport, isPlaying)
-		    break;
-		case delSlot00:
-		    deleteSlot(trackBank, 0, 0, data2, transport)
-		    break;
-		case delSlot01:
-		    deleteSlot(trackBank, 0, 1, data2, transport)
-		    break;
-		case delSlot10:
-		    deleteSlot(trackBank, 1, 0, data2, transport)
-		    break;
-		case delSlot11:
-		    deleteSlot(trackBank, 1, 1, data2, transport)
-		    break;
-		case delSlot20:
-		    deleteSlot(trackBank, 2, 0, data2, transport)
-		    break;
-		case delSlot21:
-		    deleteSlot(trackBank, 2, 1, data2, transport)
-		    break;
-		case delSlot30:
-		    deleteSlot(trackBank, 3, 0, data2, transport)
-		    break;
-		case delSlot31:
-		    deleteSlot(trackBank, 3, 1, data2, transport)
-		    break;
-		}
-	    }
-	}
     }
     
     else if (isProgramChange(status)) {
-	switch (data1) {
-	    // PC & PB 1
-	case previousPreset:
-	    cursorDevice.switchToPreviousPreset();
-	    presetHasChanged = true;
-	    println('previous preset')
-	    break;
-	case nextPreset:
-	    cursorDevice.switchToNextPreset();
-	    presetHasChanged = true;
-	    break;
-	case previousPresetCategory:
-	    cursorDevice.switchToPreviousPresetCategory();
-	    categoryHasChanged = true;
-	    break;
-	case nextPresetCategory:
-	    cursorDevice.switchToNextPresetCategory();
-	    categoryHasChanged = true;
-	    break;
-	case previousPresetCreator:
-	    cursorDevice.switchToPreviousPresetCreator();
-	    creatorHasChanged = true;
-	    break;
-	case nextPresetCreator:
-	    cursorDevice.switchToNextPresetCreator();
-	    creatorHasChanged = true;
-	    break;
-	case toggleMacro2:
-	    cursorRemoteControl.selectPreviousPage(true);
-	    break;
-	case nextMap2:
-	    cursorRemoteControl.selectNextPage(true);
-	    break;
+		switch (data1) {
+		    // PC & PB B
+		    case startbrowsing:
+				browser.startBrowsing();
+			    break;
+			case commitbrowsing:
+				browser.commitSelectedResult();		    
+			    break;
+			case nextPreset:
+			    popupBrowser.selectNextFile();
+			    break;
+			case previousPreset:
+			    popupBrowser.selectPreviousFile();
+			    break;
+			case devPageUp:
+			    cursorDevice.selectNext();
+			    deviceHasChanged = true;
+			    break;
+			case devPageDown:
+			    cursorDevice.selectPrevious();
+			    deviceHasChanged = true;
+			    break;
+			case previousRC2:
+			    cursorRemoteControl.selectPreviousPage(true);
+			    break;
+			case nextRC2:
+			    cursorRemoteControl.selectNextPage(true);
+			    break;
 
-	    // PC & PB 2
-	case inspector:
-	    application.toggleInspector();
-	    break;
-	case perspective:
-	    application.nextPerspective();
-	    break;
-	case projectbutton:
-	    application.nextProject();
-	    break;
-	case browser:
-	    application.toggleBrowserVisibility();
-	    break;
-	case note:
-	    application.toggleNoteEditor();
-	    break;
-	case automation:
-	    application.toggleAutomationEditor();
-	    break;
-	case mixer:
-	    application.toggleMixer();
-	    break;
-	case devicebutton:
-	    application.toggleDevices();
-	    break;
-
+		    // PC & PB B
+			case inspector:
+			    application.toggleInspector();
+			    break;
+			case perspective:
+			    application.nextPanelLayout();
+			    break;
+			case projectbutton:
+			    application.nextProject();
+			    break;
+			case browser:
+			    application.toggleBrowserVisibility();
+			    break;
+			case note:
+			    application.toggleNoteEditor();
+			    break;
+			case automation:
+			    application.toggleAutomationEditor();
+			    break;
+			case mixer:
+			    application.toggleMixer();
+			    break;
+			case devicebutton:
+			    application.toggleDevices();
+			    break;
+		}
 	}
-    }
-    
     lastCC=data1;
-
 }
 
 

@@ -1,9 +1,9 @@
 
 // MIDI status channels
-CCStatus = 176
-PCStatus = 192
-//LEDStatus = 144
-LEDStatus = null
+var CCStatus = 176
+var PCStatus = 192
+var LEDStatus = 144
+//var LEDStatus = null
 
 var LED=
 {
@@ -106,35 +106,27 @@ var macro8=Knobs1.Knob08
 var stop = CC1.PAD01;
 var play = CC1.PAD02;
 var rec = CC1.PAD03;
-var od = CC1.PAD04;
+var cursorTrackDown = CC1.PAD04;
 var toggleArmCursorTrack = CC1.PAD05;
 var toggleSoloCursorTrack = CC1.PAD06;
 var toggleMuteCursorTrack = CC1.PAD07;
-var clipOVR = CC1.PAD08;
+var cursorTrackUp = CC1.PAD08;
 
 // CC & PB B - Navigation and Transpose + Mapping
-var cursorTrackUp = CC1.PAD13;
-var cursorTrackDown = CC1.PAD09;
-var devPageUp = CC1.PAD14;
-var devPageDown = CC1.PAD10;
+var tapTempo = CC1.PAD13;
+// var cursorTrackDown = CC1.PAD09;
+// var devPageUp = CC1.PAD14;
+// var devPageDown = CC1.PAD10;
+// var shiftPadsUp = CC1.PAD15;
+// var shiftPadsDown = CC1.PAD11;
 var shiftPadsUp = CC1.PAD15;
 var shiftPadsDown = CC1.PAD11;
-var toggleMacro = CC1.PAD16;
-var nextMap = CC1.PAD12;
+var previousRC = CC1.PAD16;
+var nextRC = CC1.PAD12;
 
 
-// PC & PB A - Preset Navigation
-var previousPreset = PC1.PAD13;
-var nextPreset = PC1.PAD09;
-var previousPresetCategory = PC1.PAD14;
-var nextPresetCategory = PC1.PAD10;
-var previousPresetCreator = PC1.PAD15;
-var nextPresetCreator = PC1.PAD11;
-var toggleMacro2 = PC1.PAD16;
-var nextMap2 = PC1.PAD12;
 
-
-// PC & PB B - GUI Navigation
+// PC & PB A - GUI Navigation
 var note = PC1.PAD01;
 var automation = PC1.PAD02;
 var mixer = PC1.PAD03;
@@ -143,6 +135,18 @@ var inspector = PC1.PAD05;
 var perspective = PC1.PAD06;
 var projectbutton = PC1.PAD07;
 var browser = PC1.PAD08;
+
+
+// PC & PB B - Preset Navigation
+var startbrowsing = PC1.PAD13;
+var commitbrowsing = PC1.PAD09;
+var previousPreset = PC1.PAD14;
+var nextPreset = PC1.PAD10;
+var devPageUp = PC1.PAD15;
+var devPageDown = PC1.PAD11;
+var previousRC2 = PC1.PAD16;
+var nextRC2 = PC1.PAD12;
+
 
 
 
