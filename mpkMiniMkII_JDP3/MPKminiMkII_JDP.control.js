@@ -182,7 +182,8 @@ function init(){
     cursorRemoteControl = cursorDevice.createCursorRemoteControlsPage(8);
     browser = cursorDevice.createDeviceBrowser(1,1);
     popupBrowser = host.createPopupBrowser();
-
+    metronome = transport.isMetronomeEnabled();
+    
     track = host.createCursorTrack(2, 0);
     device = track.getPrimaryDevice();
 
