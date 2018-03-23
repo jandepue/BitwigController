@@ -114,11 +114,9 @@ var cursorTrackUp = CC1.PAD08;
 
 // CC & PB B - Navigation and Transpose + Mapping
 var tapTempo = CC1.PAD13;
-// var cursorTrackDown = CC1.PAD09;
-// var devPageUp = CC1.PAD14;
-// var devPageDown = CC1.PAD10;
-// var shiftPadsUp = CC1.PAD15;
-// var shiftPadsDown = CC1.PAD11;
+var toggleMetronome = CC1.PAD09;
+//var devPageUp = CC1.PAD14;
+//var devPageDown = CC1.PAD10;
 var shiftPadsUp = CC1.PAD15;
 var shiftPadsDown = CC1.PAD11;
 var previousRC = CC1.PAD16;
@@ -133,7 +131,8 @@ var devicebutton = PC1.PAD03;
 var mixer = PC1.PAD04;
 var inspector = PC1.PAD05;
 var perspective = PC1.PAD06;
-var projectbutton = PC1.PAD07;
+//var projectbutton = PC1.PAD07;
+var editview = PC1.PAD07;
 var browserVisible = PC1.PAD08;
 
 
@@ -252,6 +251,132 @@ var delSlot20 = CC2.PAD15;
 var delSlot21 = CC2.PAD11;
 var delSlot30 = CC2.PAD16;
 var delSlot31 = CC2.PAD12;
+
+//// PC & PB A - Preset Navigation
+//var previousPreset = PC1.PAD05;
+//var nextPreset = PC1.PAD01;
+//var previousPresetCategory = PC1.PAD06;
+//var nextPresetCategory = PC1.PAD02;
+//var previousPresetCreator = PC1.PAD07;
+//var nextPresetCreator = PC1.PAD03;
+//var toggleMacro2 = PC1.PAD08;
+//var nextMap2 = PC1.PAD04;
+
+//// PC & PB B - GUI Navigation
+//var note = PC1.PAD09;
+//var automation = PC1.PAD10;
+//var mixer = PC1.PAD11;
+//var device = PC1.PAD12;
+//var inspector = PC1.PAD13;
+//var perspective = PC1.PAD14;
+//var project = PC1.PAD15;
+//var browser = PC1.PAD16;
+
+
+
+
+// ===================== PROGRAM 3 ======================= //
+
+// var Joystick2 = 
+// {
+// 	LEFT : 43,
+// 	RIGHT : 44,
+// 	UP : 45,
+// 	DOWN : 46,
+// };
+
+var Knobs3 =
+{
+	Knob01 : 64, // TOP 4
+	Knob02 : 65,
+	Knob03 : 66,
+	Knob04 : 67,
+	Knob05 : 68, // BOTTOM 4
+	Knob06 : 69,
+	Knob07 : 70,
+	Knob08 : 71,
+};
+
+var CC3 =
+{
+	PAD01 : 72,
+	PAD02 : 73,
+	PAD03 : 74,
+	PAD04 : 75,
+	PAD05 : 76,
+	PAD06 : 77,
+	PAD07 : 78,
+	PAD08 : 79,
+	PAD09 : 80,
+	PAD10 : 81,
+	PAD11 : 82,
+	PAD12 : 83,
+	PAD13 : 84,
+	PAD14 : 85,
+	PAD15 : 86,
+	PAD16 : 87,
+};
+
+//var PC2 =
+//{
+	//PAD01 : 27,
+	//PAD02 : 28,
+	//PAD03 : 29,
+	//PAD04 : 30,
+	//PAD05 : 31,
+	//PAD06 : 32,
+	//PAD07 : 33,
+	//PAD08 : 34,
+	//PAD09 : 35,
+	//PAD10 : 36,
+	//PAD11 : 37,
+	//PAD12 : 38,
+	//PAD13 : 39,
+	//PAD14 : 40,
+	//PAD15 : 41,
+	//PAD16 : 42
+//};
+
+
+// MAPPING
+
+// Joystick
+// var moveLEFT=Joystick2.LEFT;
+// var moveRIGHT=Joystick2.RIGHT;
+// var moveUP=Joystick2.UP;
+// var moveDOWN=Joystick2.DOWN;
+
+
+//Knobs: Device Macros
+var volume0=Knobs3.Knob01
+var volume1=Knobs3.Knob02
+var volume2=Knobs3.Knob03
+var volume3=Knobs3.Knob04
+var pan0=Knobs3.Knob05
+var pan1=Knobs3.Knob06
+var pan2=Knobs3.Knob07
+var pan3=Knobs3.Knob08
+
+
+// CC & PB A - Transport and Track
+var stop3 = CC3.PAD01;
+var play3 = CC3.PAD02;
+var rec3 = CC3.PAD03;
+var recAuto3 = CC3.PAD04;
+var group0 = CC3.PAD05;
+var group1 = CC3.PAD06;
+var group2 = CC3.PAD07;
+var group3 = CC3.PAD08;
+
+// CC & PB B - Navigation and Transpose + Mapping
+var mute0 = CC3.PAD09;
+var mute1 = CC3.PAD10;
+var mute2 = CC3.PAD11;
+var mute3 = CC3.PAD12;
+var solo0 = CC3.PAD13;
+var solo1 = CC3.PAD14;
+var solo2 = CC3.PAD15;
+var solo3 = CC3.PAD16;
 
 //// PC & PB A - Preset Navigation
 //var previousPreset = PC1.PAD05;
